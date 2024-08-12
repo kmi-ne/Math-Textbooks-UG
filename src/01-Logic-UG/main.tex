@@ -1,0 +1,69 @@
+\documentclass[autodetect-engine, ja=standard, base=9pt, b5j, twoside, openright, label-section=none]{bxjsreport}
+
+
+% 変更箇所
+\ExplSyntaxOn
+\bool_set_false:N \g_my_UseLabelList_bool% labelを出力するか（編集補助機能）
+\bool_set_false:N \g_my_UseIndex_bool% 索引を出力するか
+\bool_set_false:N \g_my_UseGls_bool% 記号一覧を出力するか
+\bool_set_false:N \g_my_UseBib_bool% 参考文献を出力するか
+\ExplSyntaxOff
+
+
+% スタイルとコマンド読み込み
+\input{../settings.tex}
+\input{../common-cmd.tex}
+\input{local-cmd.tex}
+
+% タイトル
+\title{\gs\Large 学部数学のための\\ \gsb\huge 論理学}
+\author{{\gs 編：}鴎海}
+\date{\small （最終更新日：\today）}
+
+% 
+% 
+% 
+
+% 開始
+\begin{document}
+
+% タイトル
+\pagenumbering{roman}
+
+\maketitle
+
+\pagestyle{c-c}
+
+% イントロダクション
+% \input{intro.tex}
+
+% 目次
+\tableofcontents
+
+% 
+% 
+% 
+
+% 本文開始
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{nc-ns}
+
+% 第1章
+\input{sub/01-/main.tex}
+
+% 本文終了
+\cleardoublepage
+\pagestyle{c-c}
+
+% 参考文献
+\myprintbibliography
+
+% 索引
+\cleardoublepage
+\printindex
+
+% 記号索引
+\myprintglossary
+
+\end{document}

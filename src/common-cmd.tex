@@ -1,0 +1,135 @@
+% テキスト書体コマンド
+\newcommand{\gs}{\sffamily}
+\newcommand{\gsb}{\gs\bfseries}
+\newcommand{\xrm}[1]{\textrm{#1}}
+\newcommand{\xit}[1]{\textit{#1}}
+\newcommand{\xsf}[1]{\textsf{#1}}
+\newcommand{\xtt}[1]{\texttt{#1}}
+\newcommand{\xbf}[1]{\textbf{#1}}
+% 数式書体コマンド
+\newcommand{\up}[1]{\symup{#1}} % 1文字セリフ・ローマン体
+\newcommand{\mup}[1]{\mathrm{#1}} % 複数文字セリフ・ローマン体
+\newcommand{\yit}[1]{\symit{#1}} % 1文字セリフ・イタリック体
+% \newcommand{}[1]{\mathit{#1}} % 複数文字セリフ・イタリック体
+\newcommand{\sfu}[1]{\symsfup{#1}} % サンセリフ・ローマン体
+\newcommand{\sfi}[1]{\symsfit{#1}} % サンセリフ・イタリック体
+\newcommand{\frk}[1]{\symfrak{#1}} % フラクトゥール
+\newcommand{\bb}[1]{\symbb{#1}} % 黒板太字
+\newcommand{\bbi}[1]{\symbbit{#1}} % 黒板太字イタリック体
+\newcommand{\ncl}[1]{\symcal{#1}} % 新チャンセリー筆記体
+\newcommand{\scr}[1]{\symscr{#1}} % 新チャンセリー筆記体・小文字，ラウンド筆記体
+% - - - - - - -
+\newcommand{\bup}[1]{\symbfup{#1}} % 太字セリフ・ローマン体
+\newcommand{\bit}[1]{\symbfit{#1}} % 太字セリフ・イタリック体
+\newcommand{\bsu}[1]{\symbfsfup{#1}} % 太字サンセリフ・ローマン体
+\newcommand{\bsi}[1]{\symbfsfit{#1}} % 太字サンセリフ・イタリック体
+\newcommand{\bfr}[1]{\symbffrak{#1}} % 太字フラクトゥール
+% \newcommand{\bcl}[1]{??} % 太字旧チャンセリー筆記体
+\newcommand{\bncl}[1]{\symbfcal{#1}} % 太字新チャンセリー筆記体
+\newcommand{\bsc}[1]{\symbfscr{#1}} % 太字新チャンセリー筆記体・小文字，太字ラウンド筆記体
+% ====== 筆記体メモ ======
+% \cl P : 旧チャンセリー筆記体
+% \ncl P = \symcal P : 新チャンセリー筆記体・大文字
+% \scr p = \symscr p, \ncl p = \symcal p : 新チャンセリー筆記体・小文字
+% \scr P = \symscr P : ラウンド筆記体
+% \bcl P : 太字旧チャンセリー筆記体（未定義）
+% \bncl P = \symbfcal P : 太字新チャンセリー筆記体・大文字
+% \bsc p = \symbfscr p, \bncl p = \symbfcal p : 太字新チャンセリー筆記体・小文字
+% \bsc P = \symbfscr P : 太字ラウンド筆記体
+
+
+% 形式的証明の整形用コマンド
+\newcommand{\Release}[1]{\rx{Release (#1)}}
+\newcommand{\myTab}{\makebox[2em][l]{\scriptsize \color{mywhitegray}$⇥$}}
+\newcommand{\Show}{\textbf{Show: }}
+\newcommand{\Assume}[1]{\textbf{Assume: }{\color{myred}#1}}
+\ExplSyntaxOn
+\keys_define:nn { step } {
+  label .tl_set:N = \l_step_label_tl,
+  tab .int_set:N = \l_step_tab_int,
+  show .bool_set:N = \l_step_show_bool,
+  show .default:n = true,
+  assume .bool_set:N = \l_step_assume_bool,
+  assume .default:n = true,
+  fml .tl_set:N = \l_step_fml_tl,
+  by .clist_set:N = \l_step_by_clist,
+}
+\NewDocumentCommand { \step } { m } {
+  \item
+  \group_begin:
+    \keys_set:nn { step } { #1 }
+    \tl_if_empty:NTF \l_step_label_tl {} { \label{\l_step_label_tl} }
+    \prg_replicate:nn { \l_step_tab_int } { \myTab }
+    \bool_if:NTF \l_step_show_bool { \Show } {}
+    \bool_if:NTF \l_step_assume_bool { \Assume{\l_step_fml_tl} } { \l_step_fml_tl }
+    \clist_if_empty:NTF \l_step_by_clist {} {
+      \seq_set_from_clist:NN \l_tmpa_seq \l_step_by_clist
+      \seq_set_map:NNn \l_tmpa_seq \l_tmpa_seq {
+        \tl_set:Nn \l_tmpa_tl { ##1 }
+        \tl_if_in:NnTF \l_tmpa_tl { Axm } {
+          \nameref{\l_tmpa_tl}
+        }{
+          \tl_if_in:NnTF \l_tmpa_tl { Dfn } {
+            \cref{\l_tmpa_tl}
+          }{
+            \tl_if_in:NnTF \l_tmpa_tl { Thm } {
+              \cref{\l_tmpa_tl}
+            }{
+              \ref{\l_tmpa_tl}
+            }
+          }
+        }
+      }
+      \hspace{.5em} \hrulefill \hspace{.5em} (
+        \seq_use:Nn \l_tmpa_seq { ,\ }
+      )    
+    }
+  \group_end:
+}
+\ExplSyntaxOff
+
+
+% 数式クラスとオペレーター
+\makeatletter
+\def\opr{\@ifstar\@opr\@@opr}
+\def\@opr#1{\operatorname{#1}}
+\def\@@opr#1{\operatorname*{#1}}
+\makeatother
+\newcommand{\Opr}[1]{\operatorname{\sfu{#1}}}
+\newcommand{\MO}[1]{\mathord{#1}}
+
+% 雑記号
+\newcommand{\：}{\colon}
+\newcommand{\…}{\dots}
+
+
+% 両側デリミタ
+\ifxetex
+  \newcommand{\lleft}{\left}
+  \newcommand{\rright}{\right}
+  \newcommand{\mmrel}{\middle}
+\else\fi
+\newcommand{\（}{\lleft(}
+\newcommand{\）}{\rright)}
+\newcommand{\pr}[1]{\lleft( #1 \rright)}
+\newcommand{\｛}{\lleft\{}
+\newcommand{\｝}{\rright\}}
+\newcommand{\cb}[1]{\lleft\{ #1 \rright\}}
+\newcommand{\⟨}{\lleft\langle}
+\newcommand{\⟩}{\rright\rangle}
+\newcommand{\ab}[1]{\lleft\langle #1 \rright\rangle}
+
+
+% 片側デリミタ
+\makeatletter
+\newcommand{\cuc}[1]{\begin{cases}#1\end{cases}} % {
+\newenvironment{sqcases}{\matrix@check\sqcases\env@sqcases}{\endarray\right.}\def\env@sqcases{\let\@ifnextchar\new@ifnextchar\left\lbrack\def\arraystretch{1.2}\array{@{}l@{\quad}l@{}}}
+\newcommand{\sqc}[1]{\begin{sqcases}#1\end{sqcases}} % [
+\makeatother
+
+% 論理記号タイプ
+\newcommand{\ra}{\varrightarrow}
+\newcommand{\la}{\varleftarrow}
+\newcommand{\lra}{\varleftrightarrow}
+\newcommand{\Defn}{\mathrel{:⇔}}
+\newcommand{\defn}{\mathrel{:\lra}}
