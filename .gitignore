@@ -9,3 +9,4 @@
 !*.sh
 !*.sty
 !*.tex
+!*disposable_ids.txt
