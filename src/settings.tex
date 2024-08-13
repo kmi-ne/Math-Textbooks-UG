@@ -185,6 +185,9 @@
 \newcommand{\itemref}[1]{\begingroup\let\perh@ps\@gobble\ref{#1}\endgroup}
 \makeatother
 % - - - - - - - - - -
+\newlist{prf}{enumerate}{1}
+\setlist[prf]{label=\texttt{\arabic*.}, ref=\texttt{\arabic*}, align=right}
+% - - - - - - - - - -
 \newlist{proc}{enumerate}{3}
 \setlist[proc, 1]{label=(\arabic{proci}), ref=(\arabic{proci})}
 \setlist[proc, 2]{label=(\arabic{proci}.\arabic{procii}), ref=(\arabic{proci}.\arabic{procii})}
@@ -239,6 +242,7 @@
 \defitem{rgl}{規約}{myblue}{例}
 \defitem{dfn}{定義}{myblue}{例}
 \defitem{mdfn}{メタ定義}{myblue}{例}
+\defitem{fct}{事実}{mygreen}{論証}
 \defitem{lem}{補題}{mygreen}{証明}
 \defitem{prp}{命題}{mygreen}{証明}
 \defitem{mthm}{メタ定理}{mygreen}{証明}
