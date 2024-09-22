@@ -1,8 +1,18 @@
+%%%%% 条件分岐
+\newcommand{\myboolTF}[3]{\csname if#1\endcsname #2 \else #3 \fi}
+\newcommand{\myboolT}[2]{\csname if#1\endcsname #2 \else \fi}
+\newcommand{\myboolF}[2]{\csname if#1\endcsname \else #2 \fi}
+
+% 
+% 
+% 
+
 %%%%% ページレイアウト
-% \setpagelayout+{vmargin=10truemm, inner=15truemm, outer=10truemm, includemp, marginparwidth=35truemm}
-\setpagelayout+{vmargin=8truemm, hmargin=10truemm, includemp, nomarginpar}
-% \usepackage{marginnote}
-% \renewcommand*{\marginfont}{\scriptsize}
+\myboolTF{BoolUseDraft}{
+  \setpagelayout+{vmargin=8truemm, inner=40truemm, outer=10truemm, includemp, nomarginpar}
+}{
+  \setpagelayout+{vmargin=8truemm, hmargin=10truemm, includemp, nomarginpar}
+}
 
 % 
 % 
@@ -15,8 +25,10 @@
 \else\fi
 \ifluatex
   \ltjsetparameter{jacharrange={-2,-3}}
-  \setsansjfont[BoldFont=HaranoAjiGothic-Bold]{HaranoAjiGothic-Medium}
-  \setmonojfont[BoldFont=HaranoAjiGothic-Bold]{HaranoAjiGothic-Medium}
+  \setsansjfont{HaranoAjiGothic}[
+    UprightFont={*-Medium},
+    BoldFont={*-Bold},
+  ]
 \else\fi
 \PassOptionsToPackage{math-style=ISO, bold-style=upright}{unicode-math}
 \usepackage[olddefault, newcmbb, varnothing]{fontsetup}
@@ -25,19 +37,10 @@
 \setsansfont{nimbussans}
 \usepackage{manfnt}
 \usepackage[old]{old-arrows}
+\usepackage{leftidx}
 \ifluatex
   \usepackage{longmath}
 \else\fi
-\makeatletter
-\AtBeginDocument{
-  \catcode`_=12
-  \begingroup\lccode`~=`_
-  \lowercase{\endgroup\let~}\sb
-  \mathcode`_="8000
-  \immediate\write\@auxout{\catcode`_=12 }
-}
-\makeatother
-\allowdisplaybreaks[4]
 
 % 
 % 
@@ -50,8 +53,10 @@
 \definecolor{myred}{HTML}{c26e7c}
 \definecolor{myyellow}{HTML}{b8ba05}
 \definecolor{mygray}{HTML}{878787}
+\definecolor{mywhitegray}{HTML}{cccccc}
 \definecolor{myurlcolor}{HTML}{ad0d00}
 \definecolor{mylinkcolor}{HTML}{2a4f99}
+\definecolor{mycitecolor}{HTML}{2a4f99}
 \newcommand{\gx}[1]{\textcolor{mygreen}{#1}}
 \newcommand{\bx}[1]{\textcolor{myblue}{#1}}
 \newcommand{\rx}[1]{\textcolor{myred}{#1}}
@@ -128,9 +133,28 @@
 % 
 % 
 
+%%%%% ウォーターマーク／ラベル表示
+\myboolT{BoolUseDraft}{
+  \usepackage{draftwatermark}
+  \usepackage[notref]{showkeys}
+  \renewcommand*{\showkeyslabelformat}[1]{\normalfont\scriptsize\ttfamily\llap{\fbox{#1}}}
+}
+
+% 
+% 
+% 
+
 %%%%% ハイパーリンク
 \usepackage{hyperref}
-\hypersetup{setpagesize=false, bookmarksdepth=4, bookmarksnumbered=true, colorlinks=true, linkcolor=mylinkcolor, citecolor=mylinkcolor, urlcolor=myurlcolor, pdfauthor={鴎海}}
+\hypersetup{setpagesize=false, bookmarksdepth=4, bookmarksnumbered=true, colorlinks=true, linkcolor=mylinkcolor, citecolor=mycitecolor, urlcolor=myurlcolor, pdfauthor={鴎海}}
+\makeatletter
+\NewDocumentCommand{\mylabel}{mO{}}{
+  \bgroup
+    \protected@edef\@currentlabelname{#2}
+    \label{#1}
+  \egroup
+}
+\makeatother
 \newcommand{\phantomlabel}[1]{\phantomsection\label{#1}}
 \newcommand{\phyperref}[2]{\hyperref[#1]{#2\textsuperscript{→p.\,\pageref*{#1}}}}
 
@@ -175,18 +199,9 @@
 \newlist{myenum*}{enumerate*}{1}
 \setlist[myenum*]{label=(\roman*), ref=(\roman*)}
 % - - - - - - - - - -
-\newlist{thmlist}{enumerate}{3}
-\setlist[thmlist, 1]{label=\arabic{thmlisti}., ref=\arabic{thmlisti}}
-\setlist[thmlist, 2]{label=\arabic{thmlisti}.\arabic{thmlistii}., ref=\arabic{thmlisti}.\arabic{thmlistii}.}
-\setlist[thmlist, 3]{label=\arabic{thmlisti}.\arabic{thmlistii}.\arabic{thmlistiii}., ref=\arabic{thmlisti}.\arabic{thmlistii}.\arabic{thmlistiii}.}
-\makeatletter
-\renewcommand{\p@thmlisti}{\perh@ps{\thetcbcounter.}}
-\protected\def\perh@ps#1{#1}
-\newcommand{\itemref}[1]{\begingroup\let\perh@ps\@gobble\ref{#1}\endgroup}
-\makeatother
-% - - - - - - - - - -
-\newlist{prf}{enumerate}{1}
-\setlist[prf]{label=\texttt{\arabic*.}, ref=\texttt{\arabic*}, align=right}
+\newlist{thmlist}{enumerate}{2}
+\setlist[thmlist, 1]{label=\arabic{thmlisti}., ref=\thetcbcounter.\arabic{thmlisti}}
+\setlist[thmlist, 2]{label=\arabic{thmlisti}.\arabic{thmlistii}., ref=\thetcbcounter.\arabic{thmlisti}.\arabic{thmlistii}}
 % - - - - - - - - - -
 \newlist{proc}{enumerate}{3}
 \setlist[proc, 1]{label=(\arabic{proci}), ref=(\arabic{proci})}
@@ -198,16 +213,30 @@
 \crefname{exci}{問}{問}
 % - - - - - - - - - -
 % descriptionのitemへのリンク
-\makeatletter
-\NewDocumentCommand\itemlab{mmO{}}{
-  \item[#1]
-  \phantomsection
-  \ifstrempty{#3}{\renewcommand{\@currentlabel}{#1}}{\renewcommand{\@currentlabel}{#3}}
-  \label{#2}
-}
-\makeatother
+% \makeatletter
+% \NewDocumentCommand{\itemlabel}{mmO{}}{
+%   \item[#1]
+%   \phantomsection
+%   \ifstrempty{#3}{\renewcommand{\@currentlabel}{#1}}{\renewcommand{\@currentlabel}{#3}}
+%   \label{#2}
+% }
+% \makeatother
 
-\usepackage{tabto}
+% 
+% 
+% 
+
+%%%%% 数式
+\everymath=\expandafter{\the\everymath \narrowbaselines\displaystyle}
+\usepackage{scalerel}
+\allowdisplaybreaks[4]
+
+% 
+% 
+% 
+
+%%%%% アルゴリズム
+\usepackage[showColor=mygreen, asmpColor=myred]{../formalproofwriter}
 
 % 
 % 
@@ -216,85 +245,51 @@
 %%%%% tcolorbox
 \usepackage{tcolorbox}
 \tcbuselibrary{skins, breakable}
-\tcbsetforeverylayer{myitm/.style={%
-  enhanced,
-  breakable,
-  colbacklower=white, coltitle=white, skin=bicolor,
-  fonttitle=\gsb,
-  boxrule=1pt,
-  sharp corners,
-}}
-\NewTColorBox[auto counter, number within=section]{none}{}{}
-\NewDocumentCommand{\defitem}{mmmm}{%
+\NewTColorBox[auto counter, number within=chapter]{none}{}{}
+% 1: 略称. 2: 日本語名. 3: 色. 4: 下側コンテンツ
+\NewDocumentCommand{\defitem}{mmmO{}}{%
   \crefname{thmlist#1}{#2}{#2}
-  \NewTColorBox[use counter from=none, crefname={#2}{#2}]{#1}{O{}O{}O{}}{%
-    myitm,
-    colframe=#3, colback=#3!10!white,
-    title={#2\thetcbcounter\ifstrempty{##3}{}{（##3）}},
-    label={\ifstrempty{##1}{item_\thetcbcounter}{##1}},
-    nameref={\ifstrempty{##2}{##3}{##2}},
+  % 1: label. 2: nameref. 3: subtitle.
+  \NewTColorBox[use counter from=none, crefname={#2}{#2}]{#1}{O{}O{}D""{}}{%
+    enhanced, breakable,
+    boxrule=0pt, frame hidden,
+    sharp corners=west,
+    colback=#3, opacityback=0.1, skin=bicolor, opacitybacklower=0,
+    coltitle=#3, fonttitle=\sffamily,
+    borderline west={2pt}{0pt}{#3},
+    attach boxed title to top left={xshift=-12pt},
+    boxed title style={tile, size=minimal, opacityback=0, bottom=2pt, borderline south={.5pt}{0pt}{#3}},
+    IfBlankF={##1}{label={##1}},
+    nameref={##2},
+    title={#2\thetcbcounter\IfBlankF{##3}{：##3}},
     before upper={\crefalias{thmlisti}{thmlist#1}},
-    after upper={\labellist{##1}},
-    before lower={{\gsb #4:}\hspace{1em}},%
+    before lower={\IfBlankF{#4}{\textsf{#4}\hspace{1\zw}}},%
   }%
 }
 \newcommand{\tcbex}{{\gsb 例:}\hspace{1em}}
-\defitem{rgl}{規約}{myblue}{例}
-\defitem{dfn}{定義}{myblue}{例}
-\defitem{mdfn}{メタ定義}{myblue}{例}
-\defitem{fct}{事実}{mygreen}{論証}
-\defitem{lem}{補題}{mygreen}{証明}
-\defitem{prp}{命題}{mygreen}{証明}
-\defitem{mthm}{メタ定理}{mygreen}{証明}
-\defitem{thm}{定理}{mygreen}{証明}
-\defitem{asm}{前提}{myred}{例}
-\defitem{axm}{公理}{myred}{例}
-\defitem{cnv}{約束}{mygray}{例}
+\defitem{rgl}{規約}{myblue}[例]
+\defitem{dfn}{定義}{myblue}[例]
+\defitem{mdfn}{メタ定義}{myblue}[例]
+\defitem{fct}{事実}{mygreen}[論証]
+\defitem{lem}{補題}{mygreen}[証明]
+\defitem{prp}{命題}{mygreen}[証明]
+\defitem{mthm}{メタ定理}{mygreen}[証明]
+\defitem{thm}{定理}{mygreen}[証明]
+\defitem{asm}{前提}{myred}[例]
+\defitem{axm}{公理}{myred}[例]
+\defitem{cnv}{約束}{mygray}[例]
 
 % 注意
-\NewTColorBox{nb}{O{}}{%
-  enhanced,
-  breakable,
-  colframe=black, colback=white, coltitle=black, colbacktitle=white,
-  borderline={.7pt}{0pt}{dashed},
-  frame hidden,
-  attach boxed title to top text left={yshift*=-\tcboxedtitleheight/2},
-  boxed title style={tile}, boxed title size=title,
-  title={\gs 注意\ifstrempty{#1}{}{（#1）}},
-}
-
-\makeatletter
-\newcommand{\setlabelname}[1]{\protected@edef\@currentlabelname{#1}}
-\makeatother
-\ExplSyntaxOn
-\bool_if:NTF \g_my_UseLabelList_bool {
-  \seq_new:N \g_my_labellist_seq
-  \NewDocumentCommand { \mylabel } { mO{} } {
-    \tl_if_blank:nTF { #2 } {} { \setlabelname{#2} }
-    \label{#1}
-    \seq_gput_right:Nn \g_my_labellist_seq { #1 }
-  }
-  \NewDocumentCommand { \labellist } { m } {
-    \group_begin:
-    \footnotesize
-    \tl_if_blank:nTF { #1 } {} {
-      \hfill ---\ label:\ \texttt{#1}
-    }
-    \seq_if_empty:NTF \g_my_labellist_seq {} {
-      \tl_if_blank:nTF { #1 } {} { \\ }
-      \hfill ---\ label:\
-      \seq_set_map:NNn \l_tmpa_seq \g_my_labellist_seq { \texttt{##1} }
-      \seq_use:Nn \l_tmpa_seq { \\ \hfill }
-    }
-    \seq_gclear:N \g_my_labellist_seq
-    \group_end:
-  }
-} {
-  \NewDocumentCommand { \mylabel } { mO{} } { \label{#1} }
-  \NewDocumentCommand { \labellist } { m } {}
-}
-\ExplSyntaxOff
-
+% \NewTColorBox{nb}{O{}}{%
+%   enhanced,
+%   breakable,
+%   colframe=black, colback=white, coltitle=black, colbacktitle=white,
+%   borderline={.7pt}{0pt}{dashed},
+%   frame hidden,
+%   attach boxed title to top text left={yshift*=-\tcboxedtitleheight/2},
+%   boxed title style={tile}, boxed title size=title,
+%   title={\gs 注意\IfBlankF{#1}{（#1）}},
+% }
 
 % 
 % 
@@ -317,51 +312,47 @@
 
 %%%%% 索引
 \ExplSyntaxOn
-\bool_if:NTF \g_my_UseIndex_bool {
-  \keys_define:nn { idx } {
-    child .tl_set:N = \l_idx_child_tl,
-    child-sort .tl_set:N = \l_idx_childsort_tl,
-    entry .tl_set:N = \l_idx_entry_tl,
-    entry-sort .tl_set:N = \l_idx_entrysort_tl
-  }
-  \NewDocumentCommand { \idx } { mmO{}O{} } {
-    \group_begin:
-    \keys_set:nn { idx } { #4 }
-    \textsf{#1}
-    \tl_if_empty:nTF { #3 } {} { （#3） }
-    \tl_if_empty:NTF \l_idx_child_tl {
-      \tl_if_empty:NTF \l_idx_entry_tl {
-        \index{#2@#1}
-      } {
-        \index{\l_idx_entrysort_tl@l_idx_entry_tl}
-      }
+\keys_define:nn { idx } {
+  child .tl_set:N = \l_idx_child_tl,
+  child-sort .tl_set:N = \l_idx_childsort_tl,
+  entry .tl_set:N = \l_idx_entry_tl,
+  entry-sort .tl_set:N = \l_idx_entrysort_tl
+}
+\NewDocumentCommand { \idx } { mmO{}O{} } {
+  \group_begin:
+  \keys_set:nn { idx } { #4 }
+  \textsf{#1}
+  \tl_if_empty:nTF { #3 } {} { （#3） }
+  \tl_if_empty:NTF \l_idx_child_tl {
+    \tl_if_empty:NTF \l_idx_entry_tl {
+      \index{#2@#1}
     } {
-      \tl_if_empty:NTF \l_idx_entry_tl {
-        \index{#2@#1!\l_idx_childsort_tl@\l_idx_child_tl}
-      } {
-        \index{\l_idx_entrysort_tl@l_idx_entry_tl!\l_idx_childsort_tl@\l_idx_child_tl}
-      }
+      \index{\l_idx_entrysort_tl@l_idx_entry_tl}
     }
-    \group_end:
+  } {
+    \tl_if_empty:NTF \l_idx_entry_tl {
+      \index{#2@#1!\l_idx_childsort_tl@\l_idx_child_tl}
+    } {
+      \index{\l_idx_entrysort_tl@l_idx_entry_tl!\l_idx_childsort_tl@\l_idx_child_tl}
+    }
   }
-  \usepackage{makeidx}
-  \makeindex
-} {
-  \newcommand { \printindex } {}
-  \NewDocumentCommand { \idx } { mmO{}O{} } {
-    \textsf{#1}
-    \tl_if_empty:nTF { #3 } {} { （#3） }
-  }
+  \group_end:
 }
 \ExplSyntaxOff
+\myboolTF{BoolShowIndex}{
+  \usepackage{makeidx}
+  \makeindex
+}{
+  \newcommand{\printindex}{}
+  \RenewDocumentCommand{\idx}{mmO{}O{}}{\textsf{#1}\IfBlankF{#3}{（#3）}}
+}
 
 % 
 % 
 % 
 
 %%%%% 参考文献
-\ExplSyntaxOn
-\bool_if:NTF \g_my_UseBib_bool {
+\myboolTF{BoolShowBib}{
   \usepackage[style=authoryear, backend=biber]{biblatex}
   \addbibresource{biblio.bib}
   \DeclareNameAlias{default}{family-given}
@@ -369,18 +360,16 @@
     \nocite{*}
     \printbibliography[title=参考文献, label=biblio]
   }
-} {
+}{
   \newcommand{\myprintbibliography}{}
 }
-\ExplSyntaxOff
 
 % 
 % 
 % 
 
 %%%%% グロッサリー
-\ExplSyntaxOn
-\bool_if:NTF \g_my_UseGls_bool {
+\myboolTF{BoolShowGls}{
   \usepackage[record]{glossaries-extra}
   \GlsXtrLoadResources[src=symbols, set-widest, sort=use]
   \newcommand{\myprintglossary}{\printunsrtglossary[style=symbol-list]}
@@ -410,15 +399,51 @@
     \renewcommand*{\glossarytitle}{記号一覧}
     \renewcommand*{\glossarytoctitle}{記号一覧}
   }
-} {
+}{
   \newcommand{\glsadd}[1]{}
   \newcommand{\myprintglossary}{}
 }
-\ExplSyntaxOff
 
 % 
 % 
 % 
 
-%%%%% 数式
-\everymath=\expandafter{\the\everymath \narrowbaselines\displaystyle}
+%%%%% 文書テンプレート
+\NewDocumentCommand{\Title}{mO{鴎海}}{
+  \title{\gs\Large 学部数学のための\\ \gsb\huge #1}
+  \author{{\gs 編：}#2}
+  \date{\small （最終更新日：\today）}
+}
+\newcommand{\BeforeMainContent}{
+  % タイトル
+  \pagenumbering{roman}
+
+  \maketitle
+
+  \pagestyle{c-c}
+
+  % イントロダクション
+  \myboolT{BoolShowIntro}{\input{intro.tex}}
+
+  % 目次
+  \tableofcontents
+
+  % 本文開始
+  \cleardoublepage
+  \pagenumbering{arabic}
+  \pagestyle{nc-ns}
+}
+\newcommand{\AfterMainContent}{
+  \cleardoublepage
+  \pagestyle{c-c}
+
+  % 参考文献
+  \myprintbibliography
+
+  % 索引
+  \cleardoublepage
+  \printindex
+
+  % 記号索引
+  \myprintglossary
+}

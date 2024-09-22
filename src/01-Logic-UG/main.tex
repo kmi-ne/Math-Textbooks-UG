@@ -1,69 +1,31 @@
-\documentclass[autodetect-engine, ja=standard, base=9pt, b5j, twoside, openright, label-section=none]{bxjsreport}
+\documentclass[autodetect-engine, ja=standard, base=9pt, b5j, vartwoside, openright, label-section=none]{bxjsreport}
+\newcommand{\mysetbool}[2]{\expandafter\newif\csname if#1\endcsname \csname #1#2\endcsname}
 
-
-% 変更箇所
-\ExplSyntaxOn
-\bool_set_false:N \g_my_UseLabelList_bool% labelを出力するか（編集補助機能）
-\bool_set_false:N \g_my_UseIndex_bool% 索引を出力するか
-\bool_set_false:N \g_my_UseGls_bool% 記号一覧を出力するか
-\bool_set_false:N \g_my_UseBib_bool% 参考文献を出力するか
-\ExplSyntaxOff
-
+% 【変更箇所】設定
+\mysetbool{BoolUseDraft}{true}% 独自ドラフト出力をするか（ラベル表示・余白変更・ウォーターマーク）
+\mysetbool{BoolShowIntro}{false}% イントロを出力するか
+\mysetbool{BoolShowIndex}{false}% 索引を出力するか
+\mysetbool{BoolShowGls}{false}% 記号一覧を出力するか
+\mysetbool{BoolShowBib}{false}% 参考文献を出力するか
+% 【変更箇所終了】
 
 % スタイルとコマンド読み込み
 \input{../settings.tex}
 \input{../common-cmd.tex}
 \input{local-cmd.tex}
 
-% タイトル
-\title{\gs\Large 学部数学のための\\ \gsb\huge 論理学}
-\author{{\gs 編：}鴎海}
-\date{\small （最終更新日：\today）}
+% 【変更箇所】タイトル
+\Title{論理学}
+% 【変更箇所終了】
 
-% 
-% 
-% 
-
-% 開始
 \begin{document}
 
-% タイトル
-\pagenumbering{roman}
+\BeforeMainContent
 
-\maketitle
-
-\pagestyle{c-c}
-
-% イントロダクション
-% \input{intro.tex}
-
-% 目次
-\tableofcontents
-
-% 
-% 
-% 
-
-% 本文開始
-\cleardoublepage
-\pagenumbering{arabic}
-\pagestyle{nc-ns}
-
-% 第1章
+% 【変更箇所】本文
 \input{sub/01-/main.tex}
+% 【変更箇所終了】
 
-% 本文終了
-\cleardoublepage
-\pagestyle{c-c}
-
-% 参考文献
-\myprintbibliography
-
-% 索引
-\cleardoublepage
-\printindex
-
-% 記号索引
-\myprintglossary
+\AfterMainContent
 
 \end{document}
