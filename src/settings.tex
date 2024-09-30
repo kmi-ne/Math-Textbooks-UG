@@ -48,9 +48,9 @@
 
 %%%%% 色
 \usepackage{xcolor}
-\definecolor{mygreen}{HTML}{70b548}
-\definecolor{myblue}{HTML}{6e9ec2}
-\definecolor{myred}{HTML}{c26e7c}
+\definecolor{mygreen}{HTML}{5aba47}
+\definecolor{myblue}{HTML}{4771ba}
+\definecolor{myred}{HTML}{ba4b47}
 \definecolor{myyellow}{HTML}{b8ba05}
 \definecolor{mygray}{HTML}{878787}
 \definecolor{mywhitegray}{HTML}{cccccc}
@@ -423,7 +423,10 @@
   \pagestyle{c-c}
 
   % イントロダクション
-  \myboolT{BoolShowIntro}{\input{intro.tex}}
+  \myboolT{BoolShowIntro}{
+    \input{../common-intro.tex}
+    \input{intro.tex}
+  }
 
   % 目次
   \tableofcontents
